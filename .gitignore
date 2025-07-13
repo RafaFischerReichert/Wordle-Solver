@@ -136,3 +136,6 @@ cython_debug/
 
 # VS Code settings
 .vscode/
+
+# Calculation files
+*.pkl
