@@ -15,18 +15,21 @@ def create_optimization_cache():
     allowed_guesses = read_word_list('allowed_wordle_guesses.txt')
     possible_answers = read_word_list('possible_wordle_answers.txt')
     
+    # Combine both lists for valid guesses (removing duplicates)
+    all_valid_guesses = list(set(allowed_guesses + possible_answers))
     print(f"Loaded {len(allowed_guesses)} allowed guesses and {len(possible_answers)} possible answers.")
+    print(f"Total unique valid guesses: {len(all_valid_guesses)}")
     
     # Cache 1: Precompute all feedback patterns
     print("\n1. Precomputing feedback patterns...")
     feedback_cache = {}
     
-    total_combinations = len(possible_answers) * len(allowed_guesses)
+    total_combinations = len(possible_answers) * len(all_valid_guesses)
     current = 0
     
     for answer in possible_answers:
         feedback_cache[answer] = {}
-        for guess in allowed_guesses:
+        for guess in all_valid_guesses:
             feedback_cache[answer][guess] = get_feedback(guess, answer)
             current += 1
             if current % 10000 == 0:
@@ -65,7 +68,8 @@ def create_optimization_cache():
     best_guess = None
     
     # Only check a subset of guesses for speed (top 1000 most common words)
-    guess_subset = allowed_guesses[:1000]
+    # Include both allowed_guesses and possible_answers in the subset
+    guess_subset = all_valid_guesses[:1000]
     
     for i, guess in enumerate(guess_subset):
         pattern_counts = {}
@@ -95,7 +99,7 @@ def create_optimization_cache():
     def score(word):
         return sum(letter_counts[c] for c in set(word))
     
-    best_guess_freq = max(allowed_guesses[:1000], key=score)
+    best_guess_freq = max(all_valid_guesses[:1000], key=score)
     first_guesses['letter_freq'] = best_guess_freq
     print(f"  Best first guess for letter frequency: {best_guess_freq}")
     

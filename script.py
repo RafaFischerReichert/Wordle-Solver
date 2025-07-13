@@ -63,9 +63,11 @@ def precompute_feedback_patterns():
     print("Precomputing feedback patterns (this may take a moment)...")
     
     # Precompute patterns for all possible answer-guess combinations
+    # Include both allowed_guesses and possible_answers as valid guesses
+    all_valid_guesses = list(set(allowed_guesses + possible_answers))
     for answer in possible_answers:
         _precomputed_patterns[answer] = {}
-        for guess in allowed_guesses:
+        for guess in all_valid_guesses:
             _precomputed_patterns[answer][guess] = get_feedback(guess, answer)
     
     # Save to cache file
@@ -123,7 +125,7 @@ def minimax_entropy(possible_answers, allowed_guesses):
     # Use precomputed first guess if available and this is the initial state
     if _first_guess_cache and len(possible_answers) == len(possible_answers) and set(possible_answers) == set(read_word_list('possible_wordle_answers.txt')):
         fg = _first_guess_cache.get('minimax_entropy')
-        if fg and fg in allowed_guesses:
+        if fg and (fg in allowed_guesses or fg in possible_answers):
             return fg
     # If no possible answers remain, return a default guess
     if len(possible_answers) == 0:
@@ -131,8 +133,13 @@ def minimax_entropy(possible_answers, allowed_guesses):
     # If only one possible answer remains, guess it!
     if len(possible_answers) == 1:
         return possible_answers[0]
-    # If 10 or fewer possible answers, only guess from possible_answers
-    guess_pool = possible_answers if len(possible_answers) <= 10 else allowed_guesses
+    # If 2 or fewer possible answers, only guess from possible_answers
+    # Otherwise, use both allowed_guesses and possible_answers
+    if len(possible_answers) <= 2:
+        guess_pool = possible_answers
+    else:
+        # Combine both lists, removing duplicates
+        guess_pool = list(set(allowed_guesses + possible_answers))
     best_score = float('inf')
     best_guesses = []
     for guess in guess_pool:
