@@ -129,7 +129,7 @@ def minimax_entropy(possible_answers, allowed_guesses):
             return fg
     # If no possible answers remain, return a default guess
     if len(possible_answers) == 0:
-        return allowed_guesses[0]
+        raise ValueError("No possible answers found")
     # If only one possible answer remains, guess it!
     if len(possible_answers) == 1:
         return possible_answers[0]
@@ -255,7 +255,10 @@ def play_wordle(strategy_func, answer=None):
                     fb = get_feedback(guess, answer)
                     print(f"Feedback: {fb}")
                 else:
-                    fb = input("Enter feedback (e.g., 20100): ").strip()
+                    fb = input("Enter feedback (e.g., 20100 or 'quit' to exit): ").strip()
+                    if fb.lower() in ['quit', 'exit']:
+                        print("Exiting game loop by user request.")
+                        return
             feedbacks.append(fb)
 
             # Debug: print possible answers after feedback
@@ -269,6 +272,7 @@ def play_wordle(strategy_func, answer=None):
             # Check for win
             if fb == "22222":
                 print(f"Solved in {attempt} guesses! The answer was {guess}.")
+                print ("Initiating next game... \n\n")
                 break
 
         else:
@@ -283,11 +287,6 @@ def play_wordle(strategy_func, answer=None):
                 _cache_dirty = False
             except Exception as e:
                 print(f"[Cache] Failed to write updated cache: {e}")
-
-        play_again = input("Play again? (y/n): ").strip().lower()
-        if play_again not in ("y", "yes"):
-            print("Thanks for playing!")
-            break
 
 # GREEN = 2, YELLOW = 1, GRAY = 0
 if __name__ == "__main__":

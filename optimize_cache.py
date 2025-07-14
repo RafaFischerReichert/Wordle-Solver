@@ -6,7 +6,7 @@ Run this script once to create cache files, then the main script will load them 
 import pickle
 import os
 from collections import Counter
-from script import read_word_list, get_feedback
+from solver import read_word_list, get_feedback
 
 def create_optimization_cache():
     """Create cache files for faster Wordle solver initialization."""
