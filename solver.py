@@ -178,54 +178,6 @@ def minimax_entropy(possible_answers, allowed_guesses):
     # Otherwise, return any of the best guesses
     return best_guesses[0]
 
-
-def minimax_entropy_answers_only(possible_answers, allowed_guesses):
-    global _cache_dirty
-    # If no possible answers remain, return a default guess
-    if len(possible_answers) == 0:
-        return allowed_guesses[0]
-    
-    # Only use possible_answers for both guesses and answer pool
-    if len(possible_answers) == 1:
-        return possible_answers[0]
-
-    best_score = float('inf')
-    best_guesses = []
-
-    for guess in possible_answers:
-        pattern_counts = {}
-        
-        if _precomputed_patterns:
-            # Use precomputed patterns for much faster lookup, but handle missing entries
-            for answer in possible_answers:
-                if answer not in _precomputed_patterns:
-                    _precomputed_patterns[answer] = {}
-                if guess not in _precomputed_patterns[answer]:
-                    _precomputed_patterns[answer][guess] = get_feedback(guess, answer)
-                    _cache_dirty = True
-                pattern = _precomputed_patterns[answer][guess]
-                pattern_counts[pattern] = pattern_counts.get(pattern, 0) + 1
-        else:
-            # Fallback to original method
-            for answer in possible_answers:
-                pattern = get_feedback(guess, answer)
-                pattern_counts[pattern] = pattern_counts.get(pattern, 0) + 1
-        
-        total = sum(pattern_counts.values())
-        expected = sum((count/total) * count for count in pattern_counts.values())
-        
-        if expected < best_score:
-            best_score = expected
-            best_guesses = [guess]
-        elif expected == best_score:
-            best_guesses.append(guess)
-    
-    # If no best guesses found, return first allowed guess
-    if not best_guesses:
-        return allowed_guesses[0]
-    
-    return best_guesses[0]
-
 # Interactive game loop
 def play_wordle(strategy_func, answer=None):
     """
