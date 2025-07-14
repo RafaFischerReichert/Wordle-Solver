@@ -207,7 +207,7 @@ def play_wordle(strategy_func, answer=None):
                     fb = get_feedback(guess, answer)
                     print(f"Feedback: {fb}")
                 else:
-                    fb = input("Enter feedback (e.g., 20100 or 'quit' to exit): ").strip()
+                    fb = input("Enter feedback (e.g., 20100 -- 2 for greens, 1 for yellows, 0 for grays/blacks) or 'quit' to exit): ").strip()
                     if fb.lower() in ['quit', 'exit']:
                         print("Exiting game loop by user request.")
                         return
