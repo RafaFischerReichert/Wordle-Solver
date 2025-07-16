@@ -126,13 +126,13 @@ def minimax_entropy(possible_answers, allowed_guesses):
     if _first_guess_cache and len(possible_answers) == len(possible_answers) and set(possible_answers) == set(read_word_list('possible_wordle_answers.txt')):
         fg = _first_guess_cache.get('minimax_entropy')
         if fg and (fg in allowed_guesses or fg in possible_answers):
-            return fg
+            return fg, None
     # If no possible answers remain, return a default guess
     if len(possible_answers) == 0:
         raise ValueError("No possible answers found")
     # If only one possible answer remains, guess it!
     if len(possible_answers) == 1:
-        return possible_answers[0]
+        return possible_answers[0], float('inf')
     # If 2 or fewer possible answers, only guess from possible_answers
     # Otherwise, use both allowed_guesses and possible_answers
     if len(possible_answers) <= 2:
@@ -170,13 +170,13 @@ def minimax_entropy(possible_answers, allowed_guesses):
             best_guesses.append(guess)
     # If no best guesses found, return first allowed guess
     if not best_guesses:
-        return allowed_guesses[0]
+        return allowed_guesses[0], float('inf')
     # Prefer a guess that is in possible_answers
     for guess in best_guesses:
         if guess in possible_answers:
-            return guess
+            return guess, best_score
     # Otherwise, return any of the best guesses
-    return best_guesses[0]
+    return best_guesses[0], best_score
 
 # Interactive game loop
 def play_wordle(strategy_func, answer=None):
@@ -193,8 +193,11 @@ def play_wordle(strategy_func, answer=None):
 
         for attempt in range(1, 7):  # Wordle allows up to 6 guesses
             # Select guess
-            guess = strategy_func(possible, allowed_guesses)
-            print(f"Attempt {attempt}: {guess}")
+            guess, score = strategy_func(possible, allowed_guesses)
+            if score is not None:
+                print(f"Attempt {attempt} (score: {score:.2f}): {guess}")
+            else:
+                print(f"Attempt {attempt} (score: N/A): {guess}")
             guesses.append(guess)
 
             # If only one possible answer remains, feedback is always 22222

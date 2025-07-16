@@ -67,9 +67,8 @@ def create_optimization_cache():
     best_score = float('inf')
     best_guess = None
     
-    # Only check a subset of guesses for speed (top 1000 most common words)
-    # Include both allowed_guesses and possible_answers in the subset
-    guess_subset = all_valid_guesses[:1000]
+    # Use ALL valid guesses for comprehensive search
+    guess_subset = all_valid_guesses
     
     for i, guess in enumerate(guess_subset):
         pattern_counts = {}
@@ -99,7 +98,7 @@ def create_optimization_cache():
     def score(word):
         return sum(letter_counts[c] for c in set(word))
     
-    best_guess_freq = max(all_valid_guesses[:1000], key=score)
+    best_guess_freq = max(all_valid_guesses, key=score)
     first_guesses['letter_freq'] = best_guess_freq
     print(f"  Best first guess for letter frequency: {best_guess_freq}")
     

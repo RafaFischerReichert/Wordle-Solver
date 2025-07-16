@@ -11,7 +11,7 @@ def simulate_game(answer, strategy_func, allowed_guesses, possible_answers):
     feedbacks = []
     possible = possible_answers[:]
     for attempt in range(1, 7):
-        guess = strategy_func(possible, allowed_guesses)
+        guess, _ = strategy_func(possible, allowed_guesses)
         guesses.append(guess)
         if guess == answer:
             return attempt
